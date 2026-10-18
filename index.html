@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraAlarm - Custom Alarm Web Application</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>AuraAlarm</h1>
+                    <span class="version">v1.0.0</span>
+                </div>
+            </div>
+            
+            <div class="developer-credit">
+                <p>Engineered by</p>
+                <span class="author-name">SPY-E & 123Tool</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="clock-display">
+                    <div id="live-time" class="time-main">00:00:00</div>
+                    <div id="live-date" class="date-sub">Friday, June 5, 2026</div>
+                </div>
+                <button id="btn-open-modal" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i> New Alarm
+                </button>
+            </header>
+
+            <section class="dashboard-grid">
+                <div class="card alarms-card">
+                    <div class="card-header">
+                        <h2>Your Alarms</h2>
+                        <span id="alarm-count" class="badge">0 Active</span>
+                    </div>
+                    <div id="alarms-container" class="alarms-list">
+                        <div class="empty-state">
+                            <i class="fa-solid fa-bell-slash"></i>
+                            <p>No alarms scheduled. Create one to get started.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card feed-card">
+                    <div class="card-header">
+                        <h2>Daily Briefing Preview</h2>
+                        <i class="fa-solid fa-rss text-muted"></i>
+                    </div>
+                    <div class="feed-content">
+                        <div class="news-widget">
+                            <span class="widget-tag">Live News Feed</span>
+                            <h3 id="news-title">Loading today's headlines...</h3>
+                            <p id="news-description">Your alarm will read this update out loud along with your custom message.</p>
+                        </div>
+                        <div class="system-status">
+                            <div class="status-item">
+                                <i class="fa-solid fa-microchip"></i>
+                                <span>TTS Core: <strong id="tts-status" class="text-success">Ready</strong></span>
+                            </div>
+                            <div class="status-item">
+                                <i class="fa-solid fa-database"></i>
+                                <span>Storage: <strong class="text-success">Local Secure</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="alarm-trigger-screen" class="trigger-screen hidden">
+        <div class="trigger-content">
+            <div class="alarm-icon-pulse">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+            <h1 id="trigger-time">00:00</h1>
+            <h2 id="trigger-label">Alarm is Ringing</h2>
+            <p id="trigger-speech-preview" class="speech-preview"></p>
+            
+            <div class="trigger-actions">
+                <button id="btn-snooze" class="btn btn-secondary btn-lg">Snooze (5m)</button>
+                <button id="btn-dismiss" class="btn btn-danger btn-lg">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="alarm-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-wrapper">
+            <div class="modal-header">
+                <h3 id="modal-title">Configure Alarm</h3>
+                <button id="btn-close-modal" class="btn-close">&times;</button>
+            </div>
+            <form id="alarm-form" autocomplete="off">
+                <input type="hidden" id="alarm-id">
+                
+                <div class="form-group">
+                    <label for="alarm-time">Time</label>
+                    <input type="time" id="alarm-time" required class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="alarm-label">Label / Name</label>
+                    <input type="text" id="alarm-label" placeholder="Morning Routine" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label>Sound Source</label>
+                    <div class="radio-toggle-group">
+                        <label class="radio-label">
+                            <input type="radio" name="sound-type" value="preset" checked>
+                            <span>Classic Bell</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="sound-type" value="custom">
+                            <span>Custom Upload</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group id-custom-sound hidden" id="custom-sound-wrapper">
+                    <label for="alarm-file">Upload Audio File</label>
+                    <input type="file" id="alarm-file" accept="audio/*" class="form-control">
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="alarm-tts-enable">
+                        <span class="custom-checkbox"></span>
+                        <span>Enable Voice Personalization (TTS)</span>
+                    </label>
+                </div>
+
+                <div class="form-group id-tts-options hidden" id="tts-options-wrapper">
+                    <label for="alarm-message">Custom Greeting Message</label>
+                    <textarea id="alarm-message" placeholder="Good morning champ! Wake up and conquer the day." class="form-control" rows="2"></textarea>
+                    
+                    <label class="checkbox-label mt-3">
+                        <input type="checkbox" id="alarm-news-enable">
+                        <span class="custom-checkbox"></span>
+                        <span>Include Daily News Flash after greeting</span>
+                    </label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" id="btn-cancel-modal" class="btn btn-muted">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Alarm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="dev-watermark-footer">Protected by AuraAlarm Architecture Engine | SPY-E & 123Tool</div>
+
+</body>
+</html>
